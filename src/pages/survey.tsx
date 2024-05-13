@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/form";
 
 import Navbar from "@/components/ui/navbar";
+import Footer from "@/components/ui/footer";
+
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -30,51 +32,60 @@ import { useRouter } from "next/router";
 
 interface SurveyProps {
   id: string;
+  surveyType: string;
 }
 
-export default function Survey({ id }: SurveyProps) {
+export default function Survey({ id, surveyType }: SurveyProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
-  const [ingredients, setIngredients] = useState([]);
-  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
-  const [popularIngredients, setPopularIngredients] = useState<string[]>([]);
+  const [items, setItems] = useState<string[]>([]);
+  const [popularItems, setPopularItems] = useState<string[]>([]);
   const router = useRouter();
   const eventname = router.query.eventName as string;
+  const surveyUsing = router.query.surveyUsing as string;
 
   const FormSchema = z.object({
-    selectedIngredients: z
+    selectedItems: z
       .array(z.string())
       .refine((value) => value.length > 0, {
-        message: "You have to select at least one ingredient.",
+        message: "You have to select at least one choice.",
       }),
   });
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      selectedIngredients: [],
+      selectedItems: [],
     },
   });
 
   useEffect(() => {
-    const fetchIngredients = async () => {
+    const fetchItems = async () => {
       try {
-        const response = await fetch("/api/getIngredients");
+        const response = await fetch(`/api/getItems?type=${surveyType}`);
         const data = await response.json();
-        setIngredients(data.flat());
+  
+        if (Array.isArray(data)) {
+          setItems(data.flat());
+        } else {
+          console.error("Expected an array but received:", data);
+        }
       } catch (error) {
-        console.error("Error fetching ingredients:", error);
+        console.error("Error fetching items:", error);
       }
     };
-
-    fetchIngredients();
-  }, []);
+  
+    // Only fetch the items if surveyType is defined
+    if (surveyType) {
+      fetchItems();
+    }
+  }, [surveyType]); // Add surveyType as a dependency
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      handleIngredientPopularity();
-    }, 5000); // Runs every 5 second
+      handleItemPopularity();
+    }, 3500); // Runs every 5 second
   
     // Cleanup function to clear the interval when the component unmounts
     return () => clearInterval(intervalId);
@@ -98,9 +109,9 @@ export default function Survey({ id }: SurveyProps) {
           description: "Your can make changes now.",
         });
         setIsAuthenticated(true);
-        const storedIngredients = localStorage.getItem(`ingredients-${user}`);
-        if (storedIngredients) {
-          form.setValue("selectedIngredients", JSON.parse(storedIngredients));
+        const storedItems = localStorage.getItem(`items-${user}`);
+        if (storedItems) {
+          form.setValue("selectedItems", JSON.parse(storedItems));
         }
       } else {
         // User doesn't exist, create a new user and add it to the eaters array
@@ -129,7 +140,7 @@ export default function Survey({ id }: SurveyProps) {
   };
 
   const handleUpdateChoices = async () => {
-    const { selectedIngredients } = form.getValues();
+    const { selectedItems } = form.getValues();
 
     try {
       const response = await fetch("/api/updateChoice", {
@@ -140,8 +151,8 @@ export default function Survey({ id }: SurveyProps) {
         body: JSON.stringify({
           mealId: id,
           name: user,
-          choices: selectedIngredients.map((ingredient:any) => ({
-            name: ingredient,
+          choices: selectedItems.map((item:any) => ({
+            name: item,
             selected: true,
           })),
         }),
@@ -152,7 +163,7 @@ export default function Survey({ id }: SurveyProps) {
           title: "Choices Updated!",
           description: "Your choices have been updated successfully.",
         });
-        localStorage.setItem(`ingredients-${user}`, JSON.stringify(selectedIngredients));
+        localStorage.setItem(`items-${user}`, JSON.stringify(selectedItems));
 
       } else {
         console.error("Error updating choices");
@@ -162,7 +173,7 @@ export default function Survey({ id }: SurveyProps) {
     }
   };
 
-  const handleIngredientPopularity = async () => {
+  const handleItemPopularity = async () => {
     try {
       const id_from_url = window.location.pathname.split("/")[1];
 
@@ -170,7 +181,7 @@ export default function Survey({ id }: SurveyProps) {
       const data = await response.json();
 
       if (response.ok) {
-        setPopularIngredients(data)
+        setPopularItems(data)
         console.log("Popularity data:", data);
       } else {
         console.error("Error fetching popularity data");
@@ -192,8 +203,6 @@ export default function Survey({ id }: SurveyProps) {
       console.error("Error copying link:", error);
     }
   }
-
-
 
   return (
     <div className="min-h-screen w-full flex flex-col">
@@ -248,35 +257,35 @@ export default function Survey({ id }: SurveyProps) {
               <h2 className="text-sm font-bold mb-2">To invite people to this event, click on the Copy Link Button below.</h2>
               <h2 className="text-sm font-bold mb-2">Make sure to click Send Choice to send your responses!</h2>
               <div className="flex items-center justify-center">
-                <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-900 w-3/4 mx-auto">
+                <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-900 w-4/4 mx-auto">
                   <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-3">
-                    {ingredients.map((ingredient, index) => (
+                    {items.map((item, index) => (
                       <div className="flex items-center space-x-2" key={index}>
                         <FormField
                           control={form.control}
-                          name="selectedIngredients"
+                          name="selectedItems"
                           render={({ field }) => (
                             <>
                               <Checkbox
-                                id={`ingredient-${ingredient}-${index}`}
-                                checked={field.value?.includes(ingredient)}
+                                id={`items-${item}-${index}`}
+                                checked={field.value?.includes(item)}
                                 onCheckedChange={(checked) => {
                                   return checked
                                     ? field.onChange([
                                         ...field.value,
-                                        ingredient,
+                                        item,
                                       ])
                                     : field.onChange(
                                         field.value?.filter(
-                                          (value) => value !== ingredient
+                                          (value) => value !== item
                                         )
                                       );
                                 }}
                               />
                               <Label
-                                htmlFor={`ingredient-${ingredient}-${index}`}
+                                htmlFor={`item-${item}-${index}`}
                               >
-                                {ingredient}
+                                {item}
                               </Label>
                             </>
                           )}
@@ -297,9 +306,9 @@ export default function Survey({ id }: SurveyProps) {
           )}
           <div className="flex justify-center py-10">
             <div className="grid grid-cols-1 gap-4 rounded-lg overflow-auto max-h-[400px] w-3/4 p-6 shadow bg-white dark:bg-gray-900">
-            <h2 className="text-2xl font-bold">Popular Ingredients</h2>
+            <h2 className="text-2xl font-bold">Popular Items</h2>
 
-              {popularIngredients.map((topping:any) => (
+              {popularItems.map((topping:any) => (
                 <div key={topping.name} className="rounded-lg bg-white p-4 shadow dark:bg-gray-900">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold">{topping.name}</h3>
@@ -314,19 +323,7 @@ export default function Survey({ id }: SurveyProps) {
           </div>
         </div>
       </main>
-      <footer className="bg-gray-900 px-4 py-3 text-white">
-        <div className="container mx-auto flex items-center justify-between">
-          <p>© 2023 What2Eat. All rights reserved.</p>
-          <div className="flex items-center space-x-4">
-            <Link className="hover:text-gray-400" href="#">
-              Privacy Policy
-            </Link>
-            <Link className="hover:text-gray-400" href="#">
-              Terms of Service
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

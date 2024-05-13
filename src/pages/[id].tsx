@@ -4,10 +4,10 @@ import { useRouter } from 'next/router';
 
 const EventPage = () => {
     const router = useRouter();
-    const { id } = router.query;
+    const { id, surveyUsing } = router.query;
   
   return (
-    <Survey id={id as string} />
+    <Survey id={id as string} surveyType={surveyUsing as string}/>
   );
 };
 

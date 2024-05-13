@@ -47,7 +47,7 @@ export default function Landing() {
         })
         router.push({
           pathname: `/${data.id}`,
-          query: { eventName: eventName },
+          query: { eventName: eventName, surveyUsing: surveyUsing},
         });
 
       } else {
@@ -60,22 +60,22 @@ export default function Landing() {
 
   return (
     <div className="flex flex-col items-center justify-center">
-        <Navbar />
-      <div className="flex flex-col items-center w-full max-w-4xl space-y-6">
+      <Navbar />
+      <div className="flex flex-col items-center w-full max-w-4xl space-y-6 px-4"> {/* Added px-4 for horizontal padding on small screens */}
         <div className="flex flex-col items-center space-y-2">
           <label className="sr-only" htmlFor="event-name">
             Event Name
           </label>
           <Input
-            className="text-2xl font-bold text-center"
+            className="text-2xl font-bold text-center w-full" 
             id="event-name"
             placeholder="Enter Event Name"
             value={eventName}
             onChange={(e) => setEventName(e.target.value)}
           />
         </div>
-        <div className="flex flex-row justify-between w-full pt-7">
-          <div className="flex flex-col w-1/2 space-y-4 pr-8">
+        <div className="flex flex-col w-full space-y-6 md:space-y-0 md:flex-row md:justify-between"> {/* Added responsive classes for stacking on small screens */}
+          <div className="flex flex-col w-full space-y-4 md:w-1/2 md:pr-8"> {/* Added responsive classes for width and padding */}
             <h2 className="text-xl font-bold">When are you eating?</h2>
             <p className="text-sm">
               Choose the day your planning this event. <br /> Click the arrows to shift the calendar.
@@ -86,11 +86,11 @@ export default function Landing() {
                 mode="single"
                 selected={date}
                 onSelect={setDate}
-                className="rounded-md border w-fit"
+                className="rounded-md border w-full"
               />
             </div>
           </div>
-          <div className="flex flex-col w-1/2 space-y-4">
+          <div className="flex flex-col w-full space-y-4 md:w-1/2"> {/* Added responsive class for width */}
             <h2 className="text-xl font-bold">Choose your topic.</h2>
             <div className="flex items-center space-x-2">
               <label className="text-sm" htmlFor="survey-type">
@@ -102,7 +102,7 @@ export default function Landing() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ingredients">Pizza Toppings</SelectItem>
-                  <SelectItem value="cuisines" disabled>Retaurants</SelectItem>
+                  <SelectItem value="cuisines">Cuisines</SelectItem>
                 </SelectContent>
               </Select>
             </div>
