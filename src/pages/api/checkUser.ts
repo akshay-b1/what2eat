@@ -16,7 +16,6 @@ export default async function handler(
 ) {
   if (req.method === 'GET') {
     const { user, pass, id } = req.query;
-    console.log(user, pass, id);
 
     try {
       // Find the meal by its ID

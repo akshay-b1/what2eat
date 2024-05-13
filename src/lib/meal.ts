@@ -15,7 +15,7 @@ const MealSchema = new mongoose.Schema({
         {
           name: String,
           selected: Boolean,
-        },
+        }
       ],
     },
   ],

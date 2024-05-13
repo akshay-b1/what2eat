@@ -45,7 +45,10 @@ export default function Landing() {
           title: "Yay! 🎉",
           description: "Event created successfully.",
         })
-        router.push(`/${data.id}`);
+        router.push({
+          pathname: `/${data.id}`,
+          query: { eventName: eventName },
+        });
 
       } else {
         console.error("Error creating meal");
@@ -56,7 +59,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-10">
+    <div className="flex flex-col items-center justify-center">
         <Navbar />
       <div className="flex flex-col items-center w-full max-w-4xl space-y-6">
         <div className="flex flex-col items-center space-y-2">
@@ -75,7 +78,7 @@ export default function Landing() {
           <div className="flex flex-col w-1/2 space-y-4 pr-8">
             <h2 className="text-xl font-bold">When are you eating?</h2>
             <p className="text-sm">
-              Click a day to choose possibilities. <br /> Click the arrows to shift the calendar.
+              Choose the day your planning this event. <br /> Click the arrows to shift the calendar.
             </p>
             <div>
               <Calendar
