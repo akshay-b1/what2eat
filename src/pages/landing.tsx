@@ -91,7 +91,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="flex flex-col w-1/2 space-y-4">
-            <h2 className="text-xl font-bold">What times might work?</h2>
+            <h2 className="text-xl font-bold">Choose your topic.</h2>
             <div className="flex items-center space-x-2">
               <label className="text-sm" htmlFor="survey-type">
                 Survey using:
@@ -101,8 +101,8 @@ export default function Landing() {
                   <SelectValue placeholder="Select a type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ingredients">Ingredients</SelectItem>
-                  <SelectItem value="cuisines">Cuisines</SelectItem>
+                  <SelectItem value="ingredients">Pizza Toppings</SelectItem>
+                  <SelectItem value="cuisines" disabled>Retaurants</SelectItem>
                 </SelectContent>
               </Select>
             </div>

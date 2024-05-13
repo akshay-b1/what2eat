@@ -208,9 +208,9 @@ export default function Survey({ id }: SurveyProps) {
                   <CardDescription>
                     Name/Password are only for this event.
                     <br />
-                    New to this event? Make up a password.
+                    <strong>New to this event?</strong> Make up a password.
                     <br />
-                    Returning? Use the same name/password.
+                    <strong>Returning?</strong> Use the same name/password.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -297,6 +297,8 @@ export default function Survey({ id }: SurveyProps) {
           )}
           <div className="flex justify-center py-10">
             <div className="grid grid-cols-1 gap-4 rounded-lg overflow-auto max-h-[400px] w-3/4 p-6 shadow bg-white dark:bg-gray-900">
+            <h2 className="text-2xl font-bold">Popular Ingredients</h2>
+
               {popularIngredients.map((topping:any) => (
                 <div key={topping.name} className="rounded-lg bg-white p-4 shadow dark:bg-gray-900">
                   <div className="flex items-center justify-between">
