@@ -6,6 +6,8 @@ import { ToastAction } from "@/components/ui/toast"
 import { toast } from "@/components/ui/use-toast"
 import { useRouter } from "next/router"
 import Navbar from "@/components/ui/navbar"
+import { Loader2 } from "lucide-react";
+
 
 import React from "react"
 
@@ -13,6 +15,7 @@ export default function Landing() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [surveyUsing, setSurveyUsing] = React.useState<string>("ingredients");
   const [eventName, setEventName] = React.useState<string>("");
+  const [loading, setLoading] = React.useState<boolean>(false);
   const router = useRouter();
 
 
@@ -28,6 +31,9 @@ export default function Landing() {
         })
         return;
       }
+
+      // set loading state to true
+      setLoading(true);
 
       const response = await fetch("/api/add", {
         method: "POST",
@@ -45,15 +51,23 @@ export default function Landing() {
           title: "Yay! 🎉",
           description: "Event created successfully.",
         })
+        
+        // set loading state to false
+        setLoading(false);
+
         router.push({
           pathname: `/${data.id}`,
           query: { eventName: eventName, surveyUsing: surveyUsing},
         });
 
       } else {
+        // set loading state to false
+        setLoading(false);
         console.error("Error creating meal");
       }
     } catch (error) {
+      // set loading state to false
+      setLoading(false);
       console.error("Error:", error);
     }
   };
@@ -107,7 +121,16 @@ export default function Landing() {
               </Select>
             </div>
             <div className="h-1"></div>
-            <Button onClick={handleCreateEvent}>Create Event</Button>
+            {
+              loading ? (
+                <Button disabled>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait
+                </Button>
+              ) : (
+                <Button onClick={handleCreateEvent}>Create Event</Button>
+              )
+            }
             </div>
         </div>
       </div>

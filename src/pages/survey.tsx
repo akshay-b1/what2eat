@@ -246,7 +246,7 @@ export default function Survey({ id, surveyType }: SurveyProps) {
                     </div>
                     <div className="flex justify-between">
                       <Button onClick={handleLogin}> Sign In</Button>
-                      <Button onClick={handleCopyLink}> 
+                      <Button type="button" onClick={handleCopyLink}> 
                         <CopyIcon className="mr-2 h-4 w-4" />
                         Copy Link to Share
                       </Button>
