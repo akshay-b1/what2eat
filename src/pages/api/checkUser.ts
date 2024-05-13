@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import connectDB from '../../lib/db';
 import Meal from '../../lib/meal';
+const bcrypt = require('bcrypt');
 
 // Connect to the MongoDB database
 connectDB();
@@ -24,11 +25,23 @@ export default async function handler(
       if (!meal) {
         return res.status(404).json({ exists: false });
       }
-
       // Check if a user with the provided name and password exists in the eaters array
-      const userExists = meal.eaters.some(
-        (eater:any) => eater.user === user && eater.pass === pass
-      );
+      let userExists = false;
+      for (const eater of meal.eaters) {
+        console.log("here", eater.user, user)
+
+        if (eater.user === user) {
+          // Compare the provided password with the hashed password
+          const isPasswordValid = await bcrypt.compare(pass, eater.pass);
+          console.log("passwords",pass, eater.pass, isPasswordValid)
+          if (isPasswordValid) {
+            userExists = true;
+            break;
+          }
+        }
+        console.log("returning false")
+      }
+      console.log("userexeist",userExists);
 
       res.status(200).json({ exists: userExists });
     } catch (error) {

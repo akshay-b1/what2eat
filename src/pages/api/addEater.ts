@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import connectDB from '../../lib/db';
 import Meal from '../../lib/meal';
-
+const bcrypt = require('bcrypt');
 
 // Connect to the MongoDB database
 connectDB();
@@ -27,12 +27,14 @@ export default async function handler(
       if (!meal) {
         return res.status(404).json({ error: 'Meal not found' });
       }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPass = await bcrypt.hash(eaterData.pass, salt);
       
       // Create a new eater object
       const newEater: EaterData = {
         user: eaterData.user,
-        pass: eaterData.pass,
-        // Add any other required fields for the eater
+        pass: hashedPass,
       };
 
       // Check if the eaters field exists and is an array
