@@ -12,28 +12,50 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import {
-  Form,
-  FormControl,
-  FormDescription,
   FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
+
+import { Skeleton } from "@/components/ui/skeleton"
+
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog";
 
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/footer";
+
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
+
 
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/router";
+import React from "react";
 
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 interface SurveyProps {
   id: string;
   surveyType: string;
 }
+
+type ApiResponseItem = {
+  name: string;
+  address: string;
+  rating: number;
+  priceLevel?: number;
+};
 
 export default function Survey({ id, surveyType }: SurveyProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -41,9 +63,11 @@ export default function Survey({ id, surveyType }: SurveyProps) {
   const [pass, setPass] = useState("");
   const [items, setItems] = useState<string[]>([]);
   const [popularItems, setPopularItems] = useState<string[]>([]);
+  const [foodRecsApiResponse, setFoodRecsApiResponse] = useState<ApiResponseItem[]>([]);
+  const [isRecsLoading, setIsRecsLoading] = useState(false);
+
   const router = useRouter();
   const eventname = router.query.eventName as string;
-  const surveyUsing = router.query.surveyUsing as string;
 
   const FormSchema = z.object({
     selectedItems: z
@@ -204,6 +228,34 @@ export default function Survey({ id, surveyType }: SurveyProps) {
     }
   }
 
+  const handleFoodRecs = async (cuisine:any) => {
+    setIsRecsLoading(true);
+    try {
+      // Get the user's location
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
+
+      // Get the latitude and longitude
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      
+      const response = await fetch(`/api/foodRecs?latitude=${latitude}&longitude=${longitude}&cuisine=${encodeURIComponent(cuisine)}`);
+
+      const data = await response.json();
+      if (response.ok) {
+        setIsRecsLoading(false);
+        setFoodRecsApiResponse(data);
+      } else {
+        setIsRecsLoading(false);
+        console.error("Error fetching food recommendations");
+      }
+    } catch (error) {
+      setIsRecsLoading(false);
+      console.error("Error fetching food recommendations:", error);
+    }
+  }
+
   return (
     <div className="min-h-screen w-full flex flex-col">
       <Navbar />
@@ -309,16 +361,63 @@ export default function Survey({ id, surveyType }: SurveyProps) {
             </div>
           )}
           <div className="flex justify-center py-10">
-            <div className="grid grid-cols-1 gap-4 rounded-lg overflow-auto max-h-[400px] w-3/4 p-6 shadow bg-white dark:bg-gray-900">
+            <div className="grid grid-cols-1 gap-2 rounded-lg overflow-auto max-h-[400px] w-3/4 p-6 shadow bg-white dark:bg-gray-900">
             <h2 className="text-2xl font-bold">Popular Items</h2>
-
+            {surveyType === "cuisines" && ( <h4 className="text-sm font-bold">Click the map marker icon to get restaurant suggestions</h4> )}
               {popularItems.map((topping:any) => (
                 <div key={topping.name} className="rounded-lg bg-white p-4 shadow dark:bg-gray-900">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold">{topping.name}</h3>
-                    <div className="flex items-center space-x-2">
-                      <ArrowUpIcon className="h-5 w-5 text-green-500" />
-                      <span className="text-green-500">{topping.count}</span>
+                    <div className="flex items-center justify-between w-full">
+                      
+                      <div className="flex items-center ml-3 space-x-1">
+                        <ArrowUpIcon className="h-5 w-5 text-green-500" />
+                        <span className="text-green-500">{topping.count}</span>
+                      </div>
+                      {surveyType === "cuisines" && ( 
+                        <div className="ml-auto px-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button type="button" className="px-3 py-1  bg-blue-800 text-white rounded-lg" onClick={() => handleFoodRecs(topping.name)}><MapMarkerAltIcon /></Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px] max-h-[400px] overflow-auto">
+                              <DialogHeader>
+                                <DialogTitle>Food Recommendations</DialogTitle>
+                                <DialogDescription>
+                                  Here are some food recommendations based on your choices.
+                                </DialogDescription>
+                              </DialogHeader>
+                              {isRecsLoading ? (
+                                  <div className="flex flex-col space-y-3">
+                                    <Skeleton className="h-[125px] w-[350px] rounded-xl" />
+                                    <div className="space-y-2">
+                                      <Skeleton className="h-4 w-[350px]" />
+                                      <Skeleton className="h-4 w-[350px]" />
+                                    </div>
+                                  </div>
+                                  
+                                ) : (
+                                  foodRecsApiResponse.map((item, index) => (
+                                    <React.Fragment key={index}>
+                                      <div>
+                                        <h2>{item.name}</h2>
+                                        <p>{item.address}</p>
+                                        <p>Rating: {item.rating}</p>
+                                        {item.priceLevel && <p>Price Level: {item.priceLevel}</p>}
+                                      </div>
+                                      {index < foodRecsApiResponse.length - 1 && <Separator />}
+                                    </React.Fragment>
+                                  ))
+                                )}
+                              <DialogFooter>
+                                <DialogClose asChild>
+                                  <Button type="submit">Close</Button>
+                                </DialogClose>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      )}                      
                     </div>
                   </div>
                 </div>
@@ -372,5 +471,28 @@ function CopyIcon(props : any) {
     </svg>
   )
 }
+
+function MapMarkerAltIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      aria-hidden="true"
+      focusable="false"
+      data-prefix="fas"
+      data-icon="map-marker-alt"
+      className="svg-inline--fa fa-map-marker-alt fa-w-12"
+      role="img"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 384 512"
+    >
+      <path
+        fill="currentColor"
+        d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z"
+      ></path>
+      <circle cx="192" cy="192" r="50" fill="blue" />
+    </svg>
+  );
+}
+  
 
 export { Survey };
