@@ -231,15 +231,29 @@ export default function Survey({ id, surveyType }: SurveyProps) {
   const handleFoodRecs = async (cuisine:any) => {
     setIsRecsLoading(true);
     try {
-      // Get the user's location
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
-      });
 
-      // Get the latitude and longitude
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      
+      let latitude: number;
+      let longitude: number;
+
+      // Get the user's location
+      try {
+        // IP address method
+        const locationresponse = await fetch('https://ipapi.co/json/');
+        const location = await locationresponse.json();
+
+        // Get the latitude and longitude
+        latitude = location.latitude;
+        longitude = location.longitude;
+      } catch (error) {
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+  
+        // Get the latitude and longitude
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
+      }
+        
       const response = await fetch(`/api/foodRecs?latitude=${latitude}&longitude=${longitude}&cuisine=${encodeURIComponent(cuisine)}`);
 
       const data = await response.json();
@@ -384,7 +398,7 @@ export default function Survey({ id, surveyType }: SurveyProps) {
                               <DialogHeader>
                                 <DialogTitle>Food Recommendations</DialogTitle>
                                 <DialogDescription>
-                                  Here are some food recommendations based on your choices. This feature might not work on some safari browsers idk why.
+                                  Here are some food recommendations based on your choices. This feature might not work on some safari browsers idk why, if so try a different browser.
                                 </DialogDescription>
                               </DialogHeader>
                               {isRecsLoading ? (
