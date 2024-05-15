@@ -11,8 +11,8 @@ export default function Component() {
   return (
     <header className="flex flex-col sm:flex-row h-16 w-full items-center justify-between px-4 md:px-6 bg-gray-900 rounded-b-xl">
       <Link className="text-2xl font-semibold text-white sm:text-left text-center" href="/">
-        <span className="hidden sm:inline">what2eat 🤤 -- simplify food chaos, respect everyone&apos;s tastes</span>
-        <span className="sm:hidden">what2eat 🤤</span>
+        <span className="hidden sm:inline">tastypoll 🤤 -- simplify food chaos, respect everyone&apos;s tastes</span>
+        <span className="sm:hidden">tastypoll 🤤</span>
       </Link>
       <div className="sm:flex hidden">
         <Link
