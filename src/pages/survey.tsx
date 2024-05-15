@@ -384,7 +384,7 @@ export default function Survey({ id, surveyType }: SurveyProps) {
                               <DialogHeader>
                                 <DialogTitle>Food Recommendations</DialogTitle>
                                 <DialogDescription>
-                                  Here are some food recommendations based on your choices.
+                                  Here are some food recommendations based on your choices. This feature might not work on some safari browsers idk why.
                                 </DialogDescription>
                               </DialogHeader>
                               {isRecsLoading ? (
