@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import { Analytics } from "@vercel/analytics/react"
 
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
@@ -12,6 +13,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return(
     <Layout>
       <Component {...pageProps} />
+      <Analytics />
     </Layout>
   );
 }
