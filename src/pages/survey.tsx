@@ -376,7 +376,7 @@ export default function Survey({ id, surveyType }: SurveyProps) {
           )}
           <div className="flex justify-center py-10">
             <div className="grid grid-cols-1 gap-2 rounded-lg overflow-auto max-h-[400px] w-3/4 p-6 shadow bg-white dark:bg-gray-900">
-            <h2 className="text-2xl font-bold">Group's Popular Items</h2>
+            <h2 className="text-2xl font-bold">Group&apos;s Popular Items</h2>
             {surveyType === "cuisines" && ( <h4 className="text-sm font-bold">Click the map marker icon to get restaurant suggestions</h4> )}
               {popularItems.map((topping:any) => (
                 <div key={topping.name} className="rounded-lg bg-white p-4 shadow dark:bg-gray-900">
