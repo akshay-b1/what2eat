@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 
 import { Skeleton } from "@/components/ui/skeleton"
-
+import { Ratings } from "@/components/ui/rating"
 
 import {
   Dialog,
@@ -269,6 +269,14 @@ export default function Survey({ id, surveyType }: SurveyProps) {
       console.error("Error fetching food recommendations:", error);
     }
   }
+  
+  const renderDollarSigns = (priceLevel:number) => {
+    let dollarSigns = '';
+    for(let i = 0; i < priceLevel; i++) {
+      dollarSigns += '💲';
+    }
+    return dollarSigns;
+  }
 
   return (
     <div className="min-h-screen w-full flex flex-col">
@@ -287,7 +295,7 @@ export default function Survey({ id, surveyType }: SurveyProps) {
                     <br />
                     <strong>Returning?</strong> Use the same name/password.
                     <br />
-                    To invite people to this event, click on the Copy Link Button below!
+                    To invite people to this event, <strong>click on the Copy Link Button below!</strong>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -313,11 +321,11 @@ export default function Survey({ id, surveyType }: SurveyProps) {
                       />
                     </div>
                     <div className="flex justify-between">
-                      <Button onClick={handleLogin}> Sign In</Button>
                       <Button type="button" onClick={handleCopyLink}> 
                         <CopyIcon className="mr-2 h-4 w-4" />
                         Copy Link to Share
                       </Button>
+                      <Button type="button" onClick={handleLogin}> Sign In</Button>
                     </div>
                   </form>
                 </CardContent>
@@ -379,7 +387,7 @@ export default function Survey({ id, surveyType }: SurveyProps) {
           <div className="flex justify-center py-10">
             <div className="grid grid-cols-1 gap-2 rounded-lg overflow-auto max-h-[400px] w-3/4 p-6 shadow bg-white dark:bg-gray-900">
             <h2 className="text-2xl font-bold">Group&apos;s Popular Items</h2>
-            {surveyType === "cuisines" && ( <h4 className="text-sm font-bold">This is a live view of your group&apos;s choice. Click the map marker icon to get restaurant suggestions near you!</h4> )}
+            {surveyType === "cuisines" && ( <h4 className="text-sm font-bold">This is a live view of your group&apos;s choices. Click the map marker icon to get restaurant suggestions near you!</h4> )}
               {popularItems.map((topping:any) => (
                 <div key={topping.name} className="rounded-lg bg-white p-4 shadow dark:bg-gray-900">
                   <div className="flex items-center justify-between">
@@ -416,10 +424,10 @@ export default function Survey({ id, surveyType }: SurveyProps) {
                                   foodRecsApiResponse.map((item, index) => (
                                     <React.Fragment key={index}>
                                       <div>
-                                        <h2>{item.name}</h2>
-                                        <p>{item.address}</p>
-                                        <p>Rating: {item.rating}</p>
-                                        {item.priceLevel && <p>Price Level: {item.priceLevel}</p>}
+                                        <h2><strong>{item.name}</strong></h2>
+                                        <p>{item.address} </p>
+                                        <Ratings rating={item.rating} variant="yellow" totalStars={5}/>
+                                        {item.priceLevel && <p>{renderDollarSigns(item.priceLevel)}</p>}
                                       </div>
                                       {index < foodRecsApiResponse.length - 1 && <Separator />}
                                     </React.Fragment>
