@@ -13,7 +13,7 @@ import React from "react"
 
 export default function Landing() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
-  const [surveyUsing, setSurveyUsing] = React.useState<string>("ingredients");
+  const [surveyUsing, setSurveyUsing] = React.useState<string>("");
   const [eventName, setEventName] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
   const router = useRouter();
@@ -112,11 +112,11 @@ export default function Landing() {
               </label>
               <Select value={surveyUsing} onValueChange={(value) => setSurveyUsing(value)}>
                 <SelectTrigger id="survey-type">
-                  <SelectValue placeholder="Select a type" />
+                  <SelectValue placeholder="Select a topic" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ingredients">Pizza Toppings</SelectItem>
                   <SelectItem value="cuisines">Cuisines</SelectItem>
+                  <SelectItem value="ingredients">Pizza Toppings</SelectItem>
                 </SelectContent>
               </Select>
             </div>
