@@ -13,6 +13,7 @@ const Layout = ({ children }: LayoutProps) => {
                 {children}
                 <Analytics />
             </main>
+            <Analytics />
             <Toaster />
         </div>
     );
