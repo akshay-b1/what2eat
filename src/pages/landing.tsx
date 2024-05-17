@@ -117,6 +117,7 @@ export default function Landing() {
                 <SelectContent>
                   <SelectItem value="cuisines">Cuisines</SelectItem>
                   <SelectItem value="ingredients">Pizza Toppings</SelectItem>
+                  <SelectItem value="coming-soon" disabled>more topics coming soon...</SelectItem>
                 </SelectContent>
               </Select>
             </div>
