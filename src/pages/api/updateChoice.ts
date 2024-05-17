@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const meal = await Meal.findOne({ id: mealId });
 
       if (!meal) {
-        console.log("meal",meal)
+        // console.log("meal",meal)
         return res.status(404).json({ error: 'Meal not found' });
       }
 

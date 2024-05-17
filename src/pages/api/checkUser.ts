@@ -33,7 +33,7 @@ export default async function handler(
         if (eater.user === user) {
           // Compare the provided password with the hashed password
           const isPasswordValid = await bcrypt.compare(pass, eater.pass);
-          console.log("passwords",pass, eater.pass, isPasswordValid)
+          // console.log("passwords",pass, eater.pass, isPasswordValid)
           if (isPasswordValid) {
             userExists = true;
             break;

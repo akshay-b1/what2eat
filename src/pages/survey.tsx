@@ -206,7 +206,7 @@ export default function Survey({ id, surveyType }: SurveyProps) {
 
       if (response.ok) {
         setPopularItems(data)
-        console.log("Popularity data:", data);
+        // console.log("Popularity data:", data);
       } else {
         console.error("Error fetching popularity data");
       }
