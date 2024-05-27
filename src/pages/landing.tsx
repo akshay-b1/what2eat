@@ -72,6 +72,47 @@ export default function Landing() {
     }
   };
 
+  const handleGetNearbyRestaurants = async () => {
+    try {
+
+      let latitude: number;
+      let longitude: number;
+
+      // Get the user's location
+      try {
+        // IP address method
+        const locationresponse = await fetch('https://ipapi.co/json/');
+        const location = await locationresponse.json();
+
+        // Get the latitude and longitude
+        latitude = location.latitude;
+        longitude = location.longitude;
+      } catch (error) {
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+  
+        // Get the latitude and longitude
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
+      }
+        
+      const response = await fetch(`/api/getNearbyRestaurants?latitude=${latitude}&longitude=${longitude}`);
+
+      const data = await response.json();
+      if (response.ok) {
+        // setIsRecsLoading(false);
+        // setFoodRecsApiResponse(data);
+      } else {
+        // setIsRecsLoading(false);
+        console.error("Error fetching food recommendations");
+      }
+    } catch (error) {
+      // setIsRecsLoading(false);
+      console.error("Error fetching food recommendations:", error);
+    }
+  }
+
   return (
     <div className="flex flex-col items-center justify-center">
       <Navbar />
@@ -117,6 +158,7 @@ export default function Landing() {
                 <SelectContent>
                   <SelectItem value="cuisines">Cuisines</SelectItem>
                   <SelectItem value="ingredients">Pizza Toppings</SelectItem>
+                  <SelectItem value="nearby-restaurants" disabled>Nearby Restaurants</SelectItem>
                   <SelectItem value="coming-soon" disabled>more topics coming soon...</SelectItem>
                 </SelectContent>
               </Select>
